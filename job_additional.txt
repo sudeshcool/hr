@@ -1,0 +1,32 @@
+OVerall 15+ years and relevant 5 + years is the mandatory requirement. 
+
+Budget : 50 LPA
+
+ 
+
+Checklist
+
+ 
+
+How many years of experience in AWS services such as ( Glue,Lamba,Athena,Redshift,S3)
+5+ years of experience
+
+Have you used these AWS tools in your current project or previous
+Should be in current Project only
+
+How many years of experience in Python and Pyspark
+5+ years of experience
+
+How many years of experience in SQL
+3+ years of experience
+
+Are you familiar with Data Warehouse concepts DataWarehouse concepts like OLTP,OLAP, Star Schema, Snowflake Scehma, Dimensions, facts
+Candidate should have strong understanding
+
+Experience into any orchestrator tools such as AWS Step Functions or Apache Airflow?
+3+ years of experience
+
+Do you have experience in deployment processes?
+Minimum 2+ years of experience
+
+ 

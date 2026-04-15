@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – TalentIQ{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- ── Hero Stats ──────────────────────────────────────────────────────────── -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg,#6366f1,#8b5cf6)">
+            <i class="bi bi-briefcase-fill"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-number">{{ total_jobs }}</div>
+            <div class="stat-label">Active Jobs</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg,#06b6d4,#0ea5e9)">
+            <i class="bi bi-people-fill"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-number">{{ total_candidates }}</div>
+            <div class="stat-label">Candidates</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg,#10b981,#059669)">
+            <i class="bi bi-bar-chart-fill"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-number">{{ total_scores }}</div>
+            <div class="stat-label">Rankings Done</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg,#f59e0b,#d97706)">
+            <i class="bi bi-exclamation-circle-fill"></i>
+        </div>
+        <div class="stat-info">
+            <div class="stat-number">{{ pending_flags }}</div>
+            <div class="stat-label">Pending Info</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Two-column layout ───────────────────────────────────────────────────── -->
+<div class="row g-4 mt-1">
+    <!-- Recent Jobs -->
+    <div class="col-lg-6">
+        <div class="card-glass">
+            <div class="card-glass-header">
+                <h5><i class="bi bi-briefcase-fill me-2 text-primary"></i>Recent Job Openings</h5>
+                <a href="{{ url_for('jobs.new_job') }}" class="btn btn-sm btn-primary">+ Add Job</a>
+            </div>
+            {% if jobs %}
+            <div class="job-list">
+                {% for job in jobs %}
+                <div class="job-item">
+                    <div class="job-item-info">
+                        <div class="job-item-title">{{ job.job_title }}</div>
+                        <div class="job-item-meta">
+                            <span><i class="bi bi-building"></i> {{ job.client_name }}</span>
+                            {% if job.city %}<span><i class="bi bi-geo-alt"></i> {{ job.city }}</span>{% endif %}
+                            {% if job.salary_max %}<span><i class="bi bi-currency-dollar"></i> Up to {{
+                                "{:,.0f}".format(job.salary_max) }}</span>{% endif %}
+                        </div>
+                    </div>
+                    <div class="job-item-actions">
+                        <a href="{{ url_for('ranking.rank_for_job', job_id=job.id) }}"
+                            class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-bar-chart"></i> Rank
+                        </a>
+                        <a href="{{ url_for('jobs.view_job', job_id=job.id) }}" class="btn btn-sm btn-ghost">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-briefcase"></i>
+                <p>No jobs yet. <a href="{{ url_for('jobs.new_job') }}">Create your first job description</a>.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Rankings -->
+    <div class="col-lg-6">
+        <div class="card-glass">
+            <div class="card-glass-header">
+                <h5><i class="bi bi-trophy-fill me-2 text-warning"></i>Recent Rankings</h5>
+            </div>
+            {% if recent_scores %}
+            <div class="ranking-mini-list">
+                {% for score in recent_scores %}
+                <div class="ranking-mini-item">
+                    <div class="rank-badge rank-{{ score.rank }}">
+                        {% if score.rank == 1 %}<i class="bi bi-trophy-fill"></i>
+                        {% elif score.rank == 2 %}<i class="bi bi-award-fill"></i>
+                        {% elif score.rank == 3 %}<i class="bi bi-medal-fill"></i>
+                        {% else %}#{{ score.rank }}{% endif %}
+                    </div>
+                    <div class="ranking-mini-info">
+                        <div class="ranking-mini-name">{{ score.candidate.name }}</div>
+                        <div class="ranking-mini-job">{{ score.job.job_title }}</div>
+                    </div>
+                    <div
+                        class="score-pill {{ 'score-high' if score.total_weighted_score >= 75 else ('score-mid' if score.total_weighted_score >= 50 else 'score-low') }}">
+                        {{ "%.1f"|format(score.total_weighted_score) }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-bar-chart"></i>
+                <p>No rankings yet. Select a job and run the ranking engine.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ── Quick Actions ───────────────────────────────────────────────────────── -->
+<div class="card-glass mt-4">
+    <div class="card-glass-header">
+        <h5><i class="bi bi-lightning-charge-fill me-2 text-warning"></i>Quick Actions</h5>
+    </div>
+    <div class="quick-actions-grid">
+        <a href="{{ url_for('jobs.new_job') }}" class="quick-action-card">
+            <div class="qa-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i
+                    class="bi bi-plus-circle"></i></div>
+            <div class="qa-label">Post New Job</div>
+        </a>
+        <a href="{{ url_for('candidates.upload_cv') }}" class="quick-action-card">
+            <div class="qa-icon" style="background:linear-gradient(135deg,#06b6d4,#0ea5e9)"><i
+                    class="bi bi-cloud-upload"></i></div>
+            <div class="qa-label">Upload CVs</div>
+        </a>
+        <a href="{{ url_for('candidates.list_candidates') }}" class="quick-action-card">
+            <div class="qa-icon" style="background:linear-gradient(135deg,#10b981,#059669)"><i class="bi bi-people"></i>
+            </div>
+            <div class="qa-label">View Candidates</div>
+        </a>
+        <a href="{{ url_for('jobs.list_jobs') }}" class="quick-action-card">
+            <div class="qa-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)"><i
+                    class="bi bi-bar-chart-steps"></i></div>
+            <div class="qa-label">Run Rankings</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

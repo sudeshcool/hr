@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ candidate.name }} – TalentIQ{% endblock %}
+{% block page_title %}Candidate Profile{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card-glass">
+            <div class="card-glass-header">
+                <div>
+                    <h4 class="mb-1">{{ candidate.name }}</h4>
+                    <span class="text-muted"><i class="bi bi-envelope me-1"></i>{{ candidate.email }}</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('candidates.edit_candidate', candidate_id=candidate.id) }}"
+                        class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
+                </div>
+            </div>
+            <div class="p-4">
+                {% if candidate.skills %}
+                <h6 class="fw-bold text-muted text-uppercase small mb-2">Skills</h6>
+                <div class="skill-tags mb-4">
+                    {% for skill in candidate.skills_list() %}
+                    <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if candidate.cv_text %}
+                <h6 class="fw-bold text-muted text-uppercase small mb-2">CV Extract (first 2000 chars)</h6>
+                <div class="jd-text-display">{{ candidate.cv_text[:2000] }}{% if candidate.cv_text|length > 2000 %}...{%
+                    endif %}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card-glass">
+            <div class="card-glass-header">
+                <h6 class="mb-0"><i class="bi bi-person-vcard me-2"></i>Details</h6>
+            </div>
+            <ul class="constraint-list">
+                <li><i class="bi bi-telephone text-success"></i><span>Phone</span><strong>{{ candidate.phone or '—'
+                        }}</strong></li>
+                <li><i class="bi bi-geo-alt-fill text-danger"></i><span>Current City</span><strong>{{
+                        candidate.current_city or '—' }}</strong></li>
+                <li><i class="bi bi-geo-alt text-warning"></i><span>Preferred Cities</span><strong>{{
+                        candidate.preferred_cities or '—' }}</strong></li>
+                <li><i class="bi bi-cash-coin text-success"></i><span>Current CTC</span><strong>{{
+                        "{:,.0f}".format(candidate.current_salary) if candidate.current_salary else '—' }}</strong></li>
+                <li><i class="bi bi-cash-stack text-cyan"></i><span>Expected CTC</span><strong>{{
+                        "{:,.0f}".format(candidate.expected_salary) if candidate.expected_salary else '—' }}</strong>
+                </li>
+                <li><i class="bi bi-clock-fill text-warning"></i><span>Notice Period</span><strong>{{
+                        (candidate.notice_period_days|string + ' days') if candidate.notice_period_days else '—'
+                        }}</strong></li>
+                <li><i class="bi bi-mortarboard-fill text-primary"></i><span>Education</span><strong>{{
+                        candidate.education or '—' }}</strong></li>
+                <li><i class="bi bi-star-fill text-info"></i><span>Experience</span><strong>{{
+                        (candidate.years_experience|string + ' yrs') if candidate.years_experience else '—' }}</strong>
+                </li>
+                <li><i class="bi bi-database-fill text-secondary"></i><span>Data Source</span>
+                    <strong><span
+                            class="badge {{ 'bg-primary' if candidate.data_source == 'cv' else 'bg-warning text-dark' }}">{{
+                            candidate.data_source|upper }}</span></strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

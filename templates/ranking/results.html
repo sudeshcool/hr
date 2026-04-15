@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block title %}Rankings – {{ job.job_title }} – TalentIQ{% endblock %}
+{% block page_title %}Candidate Rankings{% endblock %}
+{% block content %}
+
+<!-- Job Header -->
+<div class="ranking-job-header mb-4">
+    <div>
+        <h4 class="mb-1">{{ job.job_title }}</h4>
+        <span class="text-muted"><i class="bi bi-building me-1"></i>{{ job.client_name }}
+            {% if job.city %} &nbsp;·&nbsp; <i class="bi bi-geo-alt me-1"></i>{{ job.city }}{% endif %}
+            {% if job.salary_max %} &nbsp;·&nbsp; <i class="bi bi-cash-coin me-1"></i>Up to {{
+            "{:,.0f}".format(job.salary_max) }}{% endif %}
+        </span>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <form method="POST" action="{{ url_for('ranking.run_ranking', job_id=job.id) }}" class="d-inline">
+            <button class="btn btn-primary" id="rankBtn">
+                <i class="bi bi-cpu-fill me-2"></i>
+                {{ 'Re-Run' if scores else 'Run' }} AI Ranking ({{ candidate_count }} candidates)
+            </button>
+        </form>
+        {% if scores %}
+        <a href="{{ url_for('ranking.export_csv', job_id=job.id) }}" class="btn btn-outline-success">
+            <i class="bi bi-download me-2"></i>Export CSV
+        </a>
+        {% endif %}
+        <a href="{{ url_for('jobs.view_job', job_id=job.id) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Back to Job
+        </a>
+    </div>
+</div>
+
+<!-- Missing Info Alerts -->
+{% if flags %}
+<div class="alert alert-warning border-warning mb-4">
+    <strong><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ flags|length }} candidate(s) have missing constraint
+        info!</strong>
+    <div class="mt-2 d-flex flex-wrap gap-2">
+        {% for flag in flags %}
+        <a href="{{ url_for('ranking.fill_missing', flag_id=flag.id) }}" class="btn btn-sm btn-warning">
+            Fill info for {{ flag.candidate.name }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Weight Legend -->
+{% if scores %}
+<div class="card-glass mb-4">
+    <div class="p-3">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <span class="fw-semibold text-muted small">SCORING WEIGHTS:</span>
+            <span class="weight-badge" style="--c:#6366f1">Skills 30%</span>
+            <span class="weight-badge" style="--c:#06b6d4">Experience 25%</span>
+            <span class="weight-badge" style="--c:#8b5cf6">Education 15%</span>
+            <span class="weight-badge" style="--c:#10b981">Salary Fit 15%</span>
+            <span class="weight-badge" style="--c:#f59e0b">Location 10%</span>
+            <span class="weight-badge" style="--c:#ef4444">Notice 5%</span>
+        </div>
+    </div>
+</div>
+
+<!-- Ranked Cards -->
+<div class="ranking-cards">
+    {% for score in scores %}
+    <div
+        class="ranking-card {{ 'ranking-card-gold' if score.rank == 1 else ('ranking-card-silver' if score.rank == 2 else ('ranking-card-bronze' if score.rank == 3 else '')) }}">
+        <!-- Rank Badge -->
+        <div class="rank-number">
+            {% if score.rank == 1 %}<i class="bi bi-trophy-fill text-warning"></i>
+            {% elif score.rank == 2 %}<i class="bi bi-award-fill" style="color:#94a3b8"></i>
+            {% elif score.rank == 3 %}<i class="bi bi-medal-fill" style="color:#cd7f32"></i>
+            {% else %}#{{ score.rank }}{% endif %}
+        </div>
+
+        <!-- Candidate Info -->
+        <div class="ranking-candidate-info">
+            <div class="rc-name">{{ score.candidate.name }}</div>
+            <div class="rc-meta">
+                <span><i class="bi bi-envelope me-1"></i>{{ score.candidate.email }}</span>
+                {% if score.candidate.current_city %}
+                <span><i class="bi bi-geo-alt me-1"></i>{{ score.candidate.current_city }}</span>
+                {% endif %}
+                {% if score.candidate.expected_salary %}
+                <span><i class="bi bi-cash-coin me-1"></i>Expected: {{ "{:,.0f}".format(score.candidate.expected_salary)
+                    }}</span>
+                {% endif %}
+                {% if score.candidate.notice_period_days %}
+                <span><i class="bi bi-clock me-1"></i>Notice: {{ score.candidate.notice_period_days }}d</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Total Score Donut -->
+        <div class="score-donut-wrap">
+            <div class="score-donut {{ 'score-high' if score.total_weighted_score >= 75 else ('score-mid' if score.total_weighted_score >= 50 else 'score-low') }}"
+                style="--pct:{{ score.total_weighted_score }}">
+                <span>{{ "%.0f"|format(score.total_weighted_score) }}</span>
+            </div>
+            <div class="score-donut-label">Overall</div>
+        </div>
+
+        <!-- Score Breakdown -->
+        <div class="score-breakdown">
+            {% set bars = [
+            ('Skills', score.skills_score, '#6366f1'),
+            ('Exp', score.experience_score, '#06b6d4'),
+            ('Education', score.education_score, '#8b5cf6'),
+            ('Salary', score.salary_score, '#10b981'),
+            ('Location', score.location_score, '#f59e0b'),
+            ('Notice', score.notice_score, '#ef4444'),
+            ] %}
+            {% for label, val, color in bars %}
+            <div class="score-bar-row">
+                <div class="score-bar-label">{{ label }}</div>
+                <div class="score-bar-track">
+                    <div class="score-bar-fill" style="width:{{ val }}%;background:{{ color }}"></div>
+                </div>
+                <div class="score-bar-val">{{ "%.0f"|format(val) }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Reasoning -->
+        {% if score.reasoning %}
+        <div class="reasoning-section">
+            <button class="btn btn-ghost btn-sm w-100 text-start reasoning-toggle" data-bs-toggle="collapse"
+                data-bs-target="#reason-{{ score.id }}">
+                <i class="bi bi-chat-quote me-2"></i>AI Reasoning & Analysis
+                <i class="bi bi-chevron-down ms-auto float-end"></i>
+            </button>
+            <div class="collapse" id="reason-{{ score.id }}">
+                <div class="reasoning-body">
+                    <p class="mb-2">{{ score.reasoning }}</p>
+                    {% if score.strengths %}
+                    <div class="reasoning-section-head text-success"><i
+                            class="bi bi-check-circle-fill me-1"></i>Strengths</div>
+                    <ul class="mb-2 text-success-subtle">
+                        {% for strength in score.get_strengths_list() %}
+                        <li>{{ strength }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% if score.weaknesses %}
+                    <div class="reasoning-section-head text-warning"><i
+                            class="bi bi-exclamation-circle-fill me-1"></i>Areas of Concern</div>
+                    <ul class="mb-0 text-warning-subtle">
+                        {% for weakness in score.get_weaknesses_list() %}
+                        <li>{{ weakness }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="empty-state-full">
+    <i class="bi bi-bar-chart-line display-1 text-muted"></i>
+    <h4 class="mt-3">No Rankings Yet</h4>
+    <p class="text-muted">Click "Run AI Ranking" to score all {{ candidate_count }} candidates against this job.</p>
+</div>
+{% endif %}
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    document.getElementById('rankBtn').closest('form').addEventListener('submit', function () {
+        const btn = document.getElementById('rankBtn');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>AI is ranking candidates...';
+        btn.disabled = true;
+    });
+</script>
+{% endblock %}

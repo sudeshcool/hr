@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Fill Missing Info – TalentIQ{% endblock %}
+{% block page_title %}Fill Missing Candidate Info{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-7">
+        <div class="card-glass">
+            <div class="card-glass-header">
+                <h5><i class="bi bi-person-exclamation me-2 text-warning"></i>
+                    Fill Missing Info – {{ candidate.name }}
+                </h5>
+            </div>
+            <div class="p-4">
+                <div class="alert alert-info mb-4">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    The following information is needed to rank <strong>{{ candidate.name }}</strong>
+                    for the job <strong>{{ job.job_title }}</strong> at <strong>{{ job.client_name }}</strong>.
+                </div>
+                <form method="POST">
+                    <div class="row g-4">
+                        {% if 'expected_salary' in missing_fields %}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-cash-coin text-success me-1"></i>Expected Annual Salary
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" name="expected_salary" class="form-control form-control-dark"
+                                step="1000" placeholder="1500000" required>
+                            <div class="form-text">Job budget: up to
+                                {% if job.salary_max %}{{ "{:,.0f}".format(job.salary_max) }}{% else %}Not specified{%
+                                endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if 'current_city' in missing_fields %}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-geo-alt-fill text-danger me-1"></i>Current City
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="current_city" class="form-control form-control-dark"
+                                placeholder="e.g. Pune" required>
+                        </div>
+                        {% endif %}
+
+                        {% if 'preferred_cities' in missing_fields %}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-geo-alt text-warning me-1"></i>Preferred Cities (for relocation)
+                            </label>
+                            <input type="text" name="preferred_cities" class="form-control form-control-dark"
+                                placeholder="Bangalore, Mumbai">
+                            <div class="form-text">Job location: <strong>{{ job.city }}</strong></div>
+                        </div>
+                        {% endif %}
+
+                        {% if 'notice_period_days' in missing_fields %}
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-clock-fill text-warning me-1"></i>Notice Period (Days)
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" name="notice_period_days" class="form-control form-control-dark"
+                                placeholder="30" required>
+                            <div class="form-text">Job requires max {{ job.notice_period_days }} days</div>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-12 d-flex gap-3 mt-2">
+                            <button type="submit" class="btn btn-warning btn-lg px-5">
+                                <i class="bi bi-check-circle-fill me-2"></i>Save & Return to Rankings
+                            </button>
+                            <a href="{{ url_for('ranking.rank_for_job', job_id=job.id) }}"
+                                class="btn btn-outline-secondary btn-lg">Skip</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

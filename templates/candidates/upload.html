@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Upload CVs – TalentIQ{% endblock %}
+{% block page_title %}Upload Candidate CVs{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+        <div class="card-glass">
+            <div class="card-glass-header">
+                <h5><i class="bi bi-cloud-arrow-up-fill me-2 text-primary"></i>Bulk CV Upload</h5>
+            </div>
+            <div class="p-4">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="upload-dropzone" id="dropzone">
+                        <div class="upload-icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+                        <h5>Drag &amp; Drop CVs Here</h5>
+                        <p class="text-muted">Supports PDF and DOCX files • Multiple files allowed</p>
+                        <label for="cvFiles" class="btn btn-primary mt-2">
+                            <i class="bi bi-folder2-open me-2"></i>Browse Files
+                        </label>
+                        <input type="file" id="cvFiles" name="cv_files" multiple accept=".pdf,.docx,.doc"
+                            class="d-none">
+                    </div>
+
+                    <div id="fileList" class="file-list mt-3 d-none"></div>
+
+                    <div class="ai-process-info mt-4">
+                        <div class="ai-process-icon"><i class="bi bi-cpu-fill"></i></div>
+                        <div>
+                            <strong>What happens next:</strong>
+                            <ul class="mb-0 mt-1">
+                                <li>Text extracted from each CV (PDF/DOCX)</li>
+                                <li>AI extracts: name, email, salary, city, notice period, skills, education</li>
+                                <li>Missing fields flagged for follow-up</li>
+                                <li>CVs indexed in vector database for semantic matching</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg" id="uploadBtn" disabled>
+                            <i class="bi bi-cpu-fill me-2"></i>Process CVs with AI
+                        </button>
+                        <a href="{{ url_for('candidates.list_candidates') }}"
+                            class="btn btn-outline-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    const input = document.getElementById('cvFiles');
+    const dropzone = document.getElementById('dropzone');
+    const fileList = document.getElementById('fileList');
+    const uploadBtn = document.getElementById('uploadBtn');
+
+    input.addEventListener('change', updateFileList);
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', e => {
+        e.preventDefault(); dropzone.classList.remove('dragover');
+        input.files = e.dataTransfer.files;
+        updateFileList();
+    });
+
+    function updateFileList() {
+        const files = Array.from(input.files);
+        if (!files.length) return;
+        fileList.classList.remove('d-none');
+        fileList.innerHTML = files.map(f => `
+    <div class="file-item">
+      <i class="bi bi-file-earmark-text text-primary"></i>
+      <span>${f.name}</span>
+      <span class="text-muted ms-auto">${(f.size / 1024).toFixed(1)} KB</span>
+    </div>`).join('');
+        uploadBtn.disabled = false;
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', function () {
+        uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        uploadBtn.disabled = true;
+    });
+</script>
+{% endblock %}

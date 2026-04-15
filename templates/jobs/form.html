@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Job' if job else 'New Job' }} – TalentIQ{% endblock %}
+{% block page_title %}{{ 'Edit Job Description' if job else 'New Job Description' }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-9">
+        <div class="card-glass">
+            <div class="card-glass-header">
+                <h5><i class="bi bi-briefcase-fill me-2 text-primary"></i>
+                    {{ 'Edit: ' + job.job_title if job else 'Add New Job Description' }}
+                </h5>
+            </div>
+            <form method="POST" class="p-4" id="jobForm">
+                <div class="row g-4">
+
+                    <!-- Client & Title -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Client Name <span class="text-danger">*</span></label>
+                        <input type="text" name="client_name" class="form-control form-control-dark"
+                            value="{{ job.client_name if job else '' }}" required placeholder="e.g. Accenture India">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
+                        <input type="text" name="job_title" class="form-control form-control-dark"
+                            value="{{ job.job_title if job else '' }}" required placeholder="e.g. Senior Data Engineer">
+                    </div>
+
+                    <!-- JD Text -->
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Job Description <span class="text-danger">*</span></label>
+                        <div class="jd-hint"><i class="bi bi-magic"></i> Paste the full JD – AI will auto-extract skills
+                            and requirements</div>
+                        <textarea name="jd_text" class="form-control form-control-dark" rows="8" required
+                            placeholder="Paste the full job description here...">{{ job.jd_text if job else '' }}</textarea>
+                    </div>
+
+                    <!-- Skills & Education -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Required Skills</label>
+                        <input type="text" name="required_skills" class="form-control form-control-dark"
+                            value="{{ job.required_skills if job else '' }}"
+                            placeholder="Python, SQL, Machine Learning, Spark (comma-separated)">
+                        <div class="form-text">Leave blank to auto-extract from JD</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Required Education</label>
+                        <input type="text" name="required_education" class="form-control form-control-dark"
+                            value="{{ job.required_education if job else '' }}"
+                            placeholder="e.g. Bachelor's in Computer Science">
+                    </div>
+
+                    <!-- Experience & Type -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Min. Experience (Years)</label>
+                        <input type="number" name="min_experience_yrs" step="0.5" min="0"
+                            class="form-control form-control-dark" value="{{ job.min_experience_yrs if job else '' }}"
+                            placeholder="5">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Employment Type</label>
+                        <select name="employment_type" class="form-select form-control-dark">
+                            {% for t in ['Full-time', 'Part-time', 'Contract', 'Internship'] %}
+                            <option value="{{ t }}" {{ 'selected' if job and job.employment_type==t else '' }}>{{ t }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check form-switch ms-2">
+                            <input class="form-check-input" type="checkbox" name="remote_ok" id="remoteOk" {{ 'checked'
+                                if job and job.remote_ok else '' }}>
+                            <label class="form-check-label fw-semibold" for="remoteOk">Remote OK?</label>
+                        </div>
+                    </div>
+
+                    <!-- Constraints Section -->
+                    <div class="col-12">
+                        <div class="section-divider">
+                            <span><i class="bi bi-sliders2 me-2"></i>Constraints (from Client)</span>
+                        </div>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold"><i class="bi bi-geo-alt-fill text-danger me-1"></i>City /
+                            Location</label>
+                        <input type="text" name="city" class="form-control form-control-dark"
+                            value="{{ job.city if job else '' }}" placeholder="e.g. Bangalore">
+                    </div>
+                    <!-- Salary -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold"><i class="bi bi-cash-coin text-success me-1"></i>Salary
+                            Min (Annual)</label>
+                        <input type="number" name="salary_min" step="1000" class="form-control form-control-dark"
+                            value="{{ job.salary_min if job else '' }}" placeholder="1200000">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold"><i class="bi bi-cash-coin text-success me-1"></i>Salary
+                            Max (Annual)</label>
+                        <input type="number" name="salary_max" step="1000" class="form-control form-control-dark"
+                            value="{{ job.salary_max if job else '' }}" placeholder="1800000">
+                    </div>
+                    <!-- Notice -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold"><i class="bi bi-clock-fill text-warning me-1"></i>Max
+                            Notice Period (Days)</label>
+                        <input type="number" name="notice_period_days" class="form-control form-control-dark"
+                            value="{{ job.notice_period_days if job else '' }}" placeholder="30">
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="col-12 d-flex gap-3 mt-2">
+                        <button type="submit" class="btn btn-primary btn-lg px-5" id="submitBtn">
+                            <i class="bi bi-check-circle-fill me-2"></i>{{ 'Update Job' if job else 'Create Job &
+                            Extract Requirements' }}
+                        </button>
+                        <a href="{{ url_for('jobs.list_jobs') }}" class="btn btn-outline-secondary btn-lg">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+    document.getElementById('jobForm').addEventListener('submit', function () {
+        const btn = document.getElementById('submitBtn');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing with AI...';
+        btn.disabled = true;
+    });
+</script>
+{% endblock %}

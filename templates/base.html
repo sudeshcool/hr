@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}TalentIQ – AI-Powered HR Platform{% endblock %}</title>
+  <meta name="description" content="TalentIQ: AI-powered candidate ranking and HR management platform." />
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ── Sidebar Navigation ─────────────────────────────────────────────────── -->
+<div class="app-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="bi bi-cpu-fill"></i></div>
+      <div>
+        <div class="brand-name">TalentIQ</div>
+        <div class="brand-sub">HR Intelligence Platform</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a href="{{ url_for('index') }}" class="nav-link-item {% if request.endpoint == 'index' %}active{% endif %}">
+        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+      </a>
+
+      <div class="nav-section-label mt-3">Jobs</div>
+      <a href="{{ url_for('jobs.list_jobs') }}" class="nav-link-item {% if 'jobs' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-briefcase-fill"></i> Job Descriptions
+      </a>
+      <a href="{{ url_for('jobs.new_job') }}" class="nav-link-item">
+        <i class="bi bi-plus-circle-fill"></i> Add New Job
+      </a>
+
+      <div class="nav-section-label mt-3">Candidates</div>
+      <a href="{{ url_for('candidates.list_candidates') }}" class="nav-link-item {% if 'candidates' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-people-fill"></i> All Candidates
+      </a>
+      <a href="{{ url_for('candidates.upload_cv') }}" class="nav-link-item">
+        <i class="bi bi-cloud-arrow-up-fill"></i> Upload CVs
+      </a>
+      <a href="{{ url_for('candidates.new_candidate') }}" class="nav-link-item">
+        <i class="bi bi-person-plus-fill"></i> Add Manually
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <i class="bi bi-shield-check-fill text-success"></i>
+      <span>AI Engine Active</span>
+    </div>
+  </aside>
+
+  <!-- ── Main Content ──────────────────────────────────────────────────────── -->
+  <main class="main-content">
+    <!-- Top bar -->
+    <header class="top-bar">
+      <div class="page-title">{% block page_title %}Dashboard{% endblock %}</div>
+      <div class="top-bar-actions">
+        <a href="{{ url_for('jobs.new_job') }}" class="btn btn-primary btn-sm">
+          <i class="bi bi-plus-lg"></i> New Job
+        </a>
+        <a href="{{ url_for('candidates.upload_cv') }}" class="btn btn-outline-light btn-sm">
+          <i class="bi bi-upload"></i> Upload CVs
+        </a>
+      </div>
+    </header>
+
+    <!-- Flash messages -->
+    <div class="px-4 pt-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+              <i class="bi bi-{{ 'check-circle-fill' if category == 'success' else 'exclamation-triangle-fill' }}"></i>
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <!-- Page body -->
+    <div class="content-body">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

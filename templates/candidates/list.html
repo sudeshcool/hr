@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Candidates – TalentIQ{% endblock %}
+{% block page_title %}All Candidates{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <p class="text-muted mb-0">{{ candidates|length }} candidate(s) in the system.</p>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('candidates.upload_cv') }}" class="btn btn-primary"><i class="bi bi-upload me-1"></i> Upload
+            CVs</a>
+        <a href="{{ url_for('candidates.new_candidate') }}" class="btn btn-outline-light"><i
+                class="bi bi-person-plus me-1"></i> Add Manually</a>
+    </div>
+</div>
+
+{% if candidates %}
+<div class="card-glass">
+    <div class="table-responsive">
+        <table class="table table-dark-custom">
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Skills</th>
+                    <th>Experience</th>
+                    <th>Expected CTC</th>
+                    <th>Location</th>
+                    <th>Notice</th>
+                    <th>Source</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in candidates %}
+                <tr>
+                    <td>
+                        <div class="candidate-name">{{ c.name }}</div>
+                        <div class="candidate-email text-muted small">{{ c.email }}</div>
+                    </td>
+                    <td>
+                        <div class="skill-tags-compact">
+                            {% for skill in c.skills_list()[:3] %}
+                            <span class="skill-tag skill-tag-sm">{{ skill }}</span>
+                            {% endfor %}
+                            {% if c.skills_list()|length > 3 %}
+                            <span class="skill-tag-sm text-muted">+{{ c.skills_list()|length - 3 }}</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>{{ c.years_experience|string + ' yrs' if c.years_experience else '—' }}</td>
+                    <td>{{ "{:,.0f}".format(c.expected_salary) if c.expected_salary else '—' }}</td>
+                    <td>{{ c.current_city or '—' }}</td>
+                    <td>{{ (c.notice_period_days|string + 'd') if c.notice_period_days else '—' }}</td>
+                    <td>
+                        <span
+                            class="badge {{ 'bg-primary' if c.data_source == 'cv' else ('bg-warning text-dark' if c.data_source == 'mixed' else 'bg-secondary') }}">
+                            {{ c.data_source|upper }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{{ url_for('candidates.edit_candidate', candidate_id=c.id) }}"
+                                class="btn btn-xs btn-outline-secondary" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('candidates.delete_candidate', candidate_id=c.id) }}"
+                                onsubmit="return confirm('Delete {{ c.name }}?')">
+                                <button type="submit" class="btn btn-xs btn-outline-danger" title="Delete"><i
+                                        class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="empty-state-full">
+    <i class="bi bi-people display-1 text-muted"></i>
+    <h4 class="mt-3">No Candidates Yet</h4>
+    <p class="text-muted">Upload CVs or add candidates manually to get started.</p>
+    <a href="{{ url_for('candidates.upload_cv') }}" class="btn btn-primary mt-2">Upload CVs</a>
+</div>
+{% endif %}
+{% endblock %}

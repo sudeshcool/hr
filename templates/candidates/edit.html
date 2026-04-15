@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if candidate else 'Add' }} Candidate – TalentIQ{% endblock %}
+{% block page_title %}{{ 'Edit Candidate' if candidate else 'Add Candidate Manually' }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-9">
+        <div class="card-glass">
+            <div class="card-glass-header">
+                <h5><i class="bi bi-person-fill me-2 text-primary"></i>
+                    {{ candidate.name if candidate else 'New Candidate' }}
+                </h5>
+            </div>
+            <form method="POST" class="p-4">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control form-control-dark"
+                            value="{{ candidate.name if candidate else '' }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                        <input type="email" name="email" class="form-control form-control-dark"
+                            value="{{ candidate.email if candidate else '' }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Phone</label>
+                        <input type="text" name="phone" class="form-control form-control-dark"
+                            value="{{ candidate.phone if candidate else '' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Current City</label>
+                        <input type="text" name="current_city" class="form-control form-control-dark"
+                            value="{{ candidate.current_city if candidate else '' }}" placeholder="e.g. Mumbai">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Preferred Cities (for relocation)</label>
+                        <input type="text" name="preferred_cities" class="form-control form-control-dark"
+                            value="{{ candidate.preferred_cities if candidate else '' }}"
+                            placeholder="Bangalore, Hyderabad">
+                    </div>
+                    <div class="col-12">
+                        <div class="section-divider"><span><i class="bi bi-cash-coin me-2"></i>Salary &
+                                Availability</span></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Current Annual Salary</label>
+                        <input type="number" name="current_salary" step="1000" class="form-control form-control-dark"
+                            value="{{ candidate.current_salary if candidate else '' }}" placeholder="1200000">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Expected Annual Salary</label>
+                        <input type="number" name="expected_salary" step="1000" class="form-control form-control-dark"
+                            value="{{ candidate.expected_salary if candidate else '' }}" placeholder="1500000">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Notice Period (Days)</label>
+                        <input type="number" name="notice_period_days" class="form-control form-control-dark"
+                            value="{{ candidate.notice_period_days if candidate else '' }}" placeholder="30">
+                    </div>
+                    <div class="col-12">
+                        <div class="section-divider"><span><i class="bi bi-mortarboard me-2"></i>Qualifications</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Highest Education</label>
+                        <input type="text" name="education" class="form-control form-control-dark"
+                            value="{{ candidate.education if candidate else '' }}"
+                            placeholder="B.Tech Computer Science">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Years of Experience</label>
+                        <input type="number" name="years_experience" step="0.5" class="form-control form-control-dark"
+                            value="{{ candidate.years_experience if candidate else '' }}" placeholder="7.5">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Skills (comma-separated)</label>
+                        <input type="text" name="skills" class="form-control form-control-dark"
+                            value="{{ candidate.skills if candidate else '' }}"
+                            placeholder="Python, TensorFlow, SQL, AWS, Communication">
+                    </div>
+                    <div class="col-12 d-flex gap-3 mt-2">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="bi bi-check-circle-fill me-2"></i>{{ 'Update Candidate' if candidate else 'Add
+                            Candidate' }}
+                        </button>
+                        <a href="{{ url_for('candidates.list_candidates') }}"
+                            class="btn btn-outline-secondary btn-lg">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
