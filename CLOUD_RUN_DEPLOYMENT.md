@@ -2,6 +2,15 @@
 
 This guide provides step-by-step instructions to deploy the Flask HR Application to Google Cloud Run.
 
+## ⚠️ Important: Cloud Run Storage Limitations
+
+**Cloud Run containers have ephemeral storage:**
+- Files written to `/tmp` are temporary and lost when the container restarts
+- SQLite database and uploaded files will NOT persist between deployments
+- **For production use, you MUST use Cloud Storage and Cloud SQL** (see below)
+
+The current configuration uses `/tmp` for development/testing only.
+
 ## Prerequisites
 
 - Google Cloud account with billing enabled

@@ -19,12 +19,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p uploads data/chromadb instance
-
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8080
+ENV UPLOAD_FOLDER=/tmp/uploads
+ENV CHROMA_DB_PATH=/tmp/chromadb
+ENV DATABASE_URL=sqlite:////tmp/hr.db
 
 # Expose port
 EXPOSE 8080

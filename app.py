@@ -9,9 +9,18 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Ensure upload and data directories exist
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    os.makedirs(app.config['CHROMA_DB_PATH'], exist_ok=True)
+    # Ensure upload and data directories exist (use /tmp for Cloud Run)
+    upload_folder = app.config['UPLOAD_FOLDER']
+    chroma_path = app.config['CHROMA_DB_PATH']
+    
+    os.makedirs(upload_folder, exist_ok=True)
+    os.makedirs(chroma_path, exist_ok=True)
+    
+    # Ensure database directory exists
+    db_path = app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', '')
+    db_dir = os.path.dirname(db_path)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
 
     # Init extensions
     db.init_app(app)
