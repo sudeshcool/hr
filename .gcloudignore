@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Instance data
+instance/
+*.db
+
+# Uploads
+uploads/
+
+# Data
+data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Logs
+*.log
+app-logs.zip
+
+# Zip files
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env

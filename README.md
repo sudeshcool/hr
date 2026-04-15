@@ -74,7 +74,29 @@ hrapplication/
    ```
 
 6. **Access the application**
-   Open your browser and navigate to `http://localhost:5000`
+   Open your browser and navigate to `http://localhost:8080`
+
+## Deployment to Azure
+
+This application can be easily deployed to Azure App Service. See the comprehensive [Azure Deployment Guide](AZURE_DEPLOYMENT.md) for detailed instructions.
+
+### Quick Deploy
+
+```bash
+# Make the deployment script executable
+chmod +x deploy_to_azure.sh
+
+# Run the deployment script
+./deploy_to_azure.sh
+```
+
+The script will guide you through the deployment process and automatically:
+- Create Azure resources (Resource Group, App Service Plan, Web App)
+- Configure application settings
+- Deploy your code to Azure
+- Enable HTTPS
+
+For manual deployment or CI/CD setup, refer to [AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md).
 
 ## Environment Variables
 
